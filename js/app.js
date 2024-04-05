@@ -13,6 +13,8 @@ const gastoListado = document.querySelector('#astos ul')
 addEventListener();
 function addEventListener() {
     document.addEventListener('DOMContentLoaded', preguntarPresupuesto);
+
+    formulario.addEventListener('submit', agregarGasto)
 }
 
 
@@ -39,10 +41,34 @@ class UI {
         document.querySelector('#total').textContent = presupuesto;
         document.querySelector('#restante').textContent = restante;
     }
+
+    imprimirAlerta(mensaje, tipoMensaje){
+        // Crear el div de la alerta
+        const divMensaje = document.createElement('div');
+        divMensaje.classList.add('text-center', 'alert');
+
+        // Validación tipo de alerta
+        if(tipoMensaje === 'error'){
+            divMensaje.classList.add('alert-danger');
+        } else {
+            divMensaje.classList.add('alert-success');
+        }
+
+        // Mnesaje de error
+        divMensaje.textContent = mensaje;
+
+        // Insertar el mensaje en el HTML
+        document.querySelector('.primario').insertBefore(divMensaje, formulario)
+
+        // Quitar alerta del HTML
+        setTimeout(() => {
+            divMensaje.remove();
+        }, 3000)
+    }
 }
 
 // Instanciar
-const ui = new UI();
+const ui = new UI(); // de forma global para acceder a las funciones
 let presupuesto; // variable global de presupuesto sin valor
 
 
@@ -62,4 +88,26 @@ function preguntarPresupuesto() {
     console.log(presupuesto);
 
     ui.insertarPresupuesto(presupuesto);
+}
+
+// Añade gastos
+function agregarGasto(e) {
+    e.preventDefault();
+
+    // Leer los datos del formulario
+    const nombre = document.querySelector('#gasto').value;
+    const cantidad = document.querySelector('#cantidad').value;
+
+    // Validación formulario
+    if (nombre === '' || cantidad === '') {
+        console.log('Error...');
+        ui.imprimirAlerta('Ambos campos son obligatorios', 'error');
+
+        return;
+    } else if( cantidad <= 0 || isNaN(cantidad)){
+        ui.imprimirAlerta('No es una cantidad válida', 'error');
+
+        return;
+    }
+    console.log('Agregando gasto...');
 }
