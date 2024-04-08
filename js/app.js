@@ -2,7 +2,7 @@
 
 
 const formulario = document.querySelector('#agregar-gasto');
-const gastoListado = document.querySelector('#astos ul')
+const gastoListado = document.querySelector('#gastos ul')
 
 
 
@@ -32,7 +32,6 @@ class Presupuesto {
     }
 
     nuevoGasto(gasto){
-
         this.gastos = [...this.gastos, gasto];
         console.log('gasto -->', this.gastos);
     }
@@ -71,6 +70,44 @@ class UI {
             divMensaje.remove();
         }, 3000)
     }
+
+    agregarGastoListado(gastos) {
+        // Elimina el HTML previo para evitar duplicidad
+        this.limpiarHTML();
+
+        // console.log('agregarGastoListado -->',gastos);
+
+        // iterar sobre los gastos
+        gastos.forEach(gasto => {
+
+            const { cantidad, nombre, id } = gasto;
+
+            // Crear li
+            const nuevoGasto = document.createElement('li');
+            nuevoGasto.className = 'list-group-item d-flex justify-content-between align-items-center';
+            // nuevoGasto.setAttribute('data-id', id); // vieja verión
+            nuevoGasto.dataset.id = id; // nueva versión
+            console.log(nuevoGasto);
+
+            // Agregar el HTML del gasto
+            nuevoGasto.innerHTML = `${nombre} <span class="badge badge-primary badge-pill"> ${cantidad}</span>`;
+
+            // Button para borrar el gasto
+            const btnBorrar = document.createElement('button');
+            btnBorrar.classList.add('btn', 'btn-danger', 'borrar-gasto');
+            btnBorrar.innerHTML = 'Borrar &times'
+            nuevoGasto.appendChild(btnBorrar)
+
+            // Agregar al HTML
+            gastoListado.appendChild(nuevoGasto)
+        })
+    };
+
+    limpiarHTML() {
+        while (gastoListado.firstChild) {
+            gastoListado.removeChild(gastoListado.firstChild)
+        }
+    };
 }
 
 // Instanciar
@@ -93,7 +130,7 @@ function preguntarPresupuesto() {
     presupuesto = new Presupuesto(presupuestoUsuario); // una vez que tengamos un presupuesto asignamos ese valor
     // console.log(presupuesto);
 
-    ui.insertarPresupuesto(presupuesto);
+    ui.insertarPresupuesto(presupuesto); // pasamos todo el objeto completo dle presupuesto
 }
 
 // Añade gastos
@@ -124,6 +161,10 @@ function agregarGasto(e) {
 
     // Mensaje success!
     ui.imprimirAlerta('Gasto agregado correctamente');
+
+    // Imprimir los gastos
+    const { gastos } = presupuesto
+    ui.agregarGastoListado( gastos );
 
     // Reinicia el formulario
     formulario.reset();
